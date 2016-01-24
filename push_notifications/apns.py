@@ -222,11 +222,13 @@ def apns_send_bulk_message(registration_ids, alert, **kwargs):
 	for identifier, registration_id in enumerate(registration_ids):
 		try:
 			_apns_send(registration_id, alert, identifier=identifier, socket=socket, **kwargs)
+			_apns_check_errors(socket)
 		except Exception, e:
 			socket.close()
 			socket = _apns_create_socket_to_push()
+			if e[0] == 8:
+				continue
 			_apns_send(registration_id, alert, identifier=identifier, socket=socket, **kwargs)
-	_apns_check_errors(socket)
 
 
 def apns_fetch_inactive_ids():
